@@ -21,6 +21,32 @@ if ( file_exists( $root.$path ) ) {
 		return false;
 	}
 } else {
+  roots_rewrites($path); // rewrite path attempt
 	chdir( $root );
 	require_once 'index.php';
 }
+
+/* {{{ roots_rewrites() */
+
+function roots_rewrites($path) {
+  global $root;
+
+  // @FIXME: Customize these values if needed
+  $roots_new_non_wp_rules = array(
+    '(/assets/(.*))'  => '/wp-content/themes/roots' . '/assets/$1',
+    '(/plugins/(.*))' => '/wp-content/plugins' . '/$1'
+  );
+
+  $path = preg_replace(
+    array_keys($roots_new_non_wp_rules),
+    array_values($roots_new_non_wp_rules),
+    $path
+  );
+
+  if (file_exists($root . $path)) {
+    header("Location: {$path}");
+    exit;
+  }
+}
+
+/* }}} */
